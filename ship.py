@@ -12,7 +12,7 @@ class Ship():
         # Loads an image of the ship and receives a rectangle.
         self.image = pygame.image.load('images/starship100x100.bmp')
         self.rect = self.image.get_rect()
-        # Every new ship appears at the bottom of the screen.
+        # Each new ship appears at the bottom of the screen.
         self.rect.midbottom = self.screen_rect.midbottom
 
         # Save float coordinates centered ship.
