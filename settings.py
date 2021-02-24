@@ -6,7 +6,7 @@ class Settings():
         """
         # Screen settings
         self.screen_width = 1280
-        self.screen_height = 450
+        self.screen_height = 600
         self.bg_color = (176, 224, 230)
 
         #Settings ship
