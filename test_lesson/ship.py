@@ -7,7 +7,7 @@ class Ship():
         self.settings = r_game.settings
         self.screen_rect = r_game.screen.get_rect()
 
-        images = 'C:\\Users\\Stuffing\\Desktop\\lessons\\Alien_invasion\\test_moving\\images\\starship100x100.bmp'
+        images = 'C:\\Users\\Stuffing\\Desktop\\lessons\\Alien_invasion\\test_lesson\\images\\starship100x100.bmp'
         self.image = pygame.image.load(images)
         self.rect = self.image.get_rect()
 
