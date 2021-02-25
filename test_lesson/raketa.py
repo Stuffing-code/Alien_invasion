@@ -5,6 +5,7 @@ import pygame
 from settings import Settings
 from ship import Ship
 from bullets import Bullet
+from invasion import Invasion
 
 class Raketa:
 
@@ -19,12 +20,16 @@ class Raketa:
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.invasions = pygame.sprite.Group()
+
+        self._create_fleet()
 
     def run_game(self):
         while True:
             self._check_event()
             self.ship.update()
             self._update_bullets()
+            self._update_invasions()
             self._update_screen()
 
     def _check_event(self):
@@ -52,6 +57,44 @@ class Raketa:
         elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
             self.ship.moving_bottom = False
 
+    def _create_fleet(self):
+        invasion = Invasion(self)
+        invasion_width, invasion_height = invasion.rect.size
+        avaible_spece_y = self.settings.screen_height - (2 * invasion_height)
+        number_invasion = avaible_spece_y // (2 * invasion_height)
+
+        ship_with = self.ship.rect.width
+        avaible_space_x = (self.settings.screen_width + (invasion_width) - ship_with)
+        nubmers_row = avaible_space_x // (2 * invasion_width)
+
+        # Create row invasion.
+        for row_number in range(nubmers_row - 1):
+            for invasion_number in range(number_invasion):
+                self._create_invasaion(invasion_number, row_number)
+
+    def _create_invasaion(self, invasion_number, row_number):
+        invasion = Invasion(self)
+        invasion_width, invasion_height = invasion.rect.size
+        invasion.y = invasion_height + 2 * invasion_height * invasion_number
+        invasion.rect.y = invasion.y
+
+        invasion.rect.x = (
+            (invasion.rect.width + 2 * invasion.rect.width * 
+            (row_number + 2)))
+
+        self.invasions.add(invasion)
+
+    def _check_fleet_edges(self):
+        for invasion in self.invasions.sprites():
+            if invasion.check_edge():
+                self._change_edge_direction()
+                break
+
+    def _change_edge_direction(self):
+        for invasion in self.invasions.sprites():
+            invasion.rect.x -= self.settings.fleet_drop_speed
+        self.settings.fleet_direction *= -1
+
     def _fire_bullets(self):
         """Create the projectile and include it in the group."""
         if len(self.bullets) < self.settings.bullet_allowed:
@@ -68,11 +111,33 @@ class Raketa:
             if bullet.rect.right >= self.settings.screen_width:
                 self.bullets.remove(bullet)
 
+        self._check_bullet_invasion_collisions()
+
+    def _update_invasions(self):
+        """
+        Update position all invasions in fleet.
+        """
+        self._check_fleet_edges()
+        self.invasions.update()
+
+    def _check_bullet_invasion_collisions(self):
+        """
+        Handing of collisions of bullets with invasions.
+        """
+        collisions = pygame.sprite.groupcollide(
+            self.bullets, self.invasions, True, True
+        )
+        if not self.invasions:
+            # Destroy bullet and create a new fleet.
+            self.bullets.empty()
+            self._create_fleet()
+
     def _update_screen(self):
         self.screen.fill(self.settings.bg_color)
         self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+        self.invasions.draw(self.screen)
 
         pygame.display.flip()
 
