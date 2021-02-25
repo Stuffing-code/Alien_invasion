@@ -5,6 +5,7 @@ import pygame
 
 from settings import Settings
 from game_stats import GameStats
+from button import Button
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
@@ -31,6 +32,9 @@ class AlienInvasion:
 
         self._create_fleet()
 
+        # Created button Play.
+        self.play_button = Button(self, "PLAY")
+
     def run_game(self):
         """Start the basic game cycle."""
         while True:
@@ -40,7 +44,7 @@ class AlienInvasion:
                 self.ship.update()
                 self._update_bullets()
                 self._update_aliens()
-            
+
             self._update_screen()
 
     def _check_event(self):
@@ -52,6 +56,28 @@ class AlienInvasion:
                     self._check_keydown_event(event)
                 elif event.type == pygame.KEYUP:
                     self._check_keyup_event(event)
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    self._check_play_button(mouse_pos)
+
+    def _check_play_button(self, mouse_pos):
+        """Played new game if down button 'PLAY'"""
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.stats.game_active:
+            # Restart gme statisticians.
+            self.stats.reset_stats()
+            self.stats.game_active = True
+
+            # Clearing lists aliens and bullets.
+            self.aliens.empty()
+            self.bullets.empty()
+
+            # Creating new fleet and placment ship in the middle.
+            self._create_fleet()
+            self.ship.center_ship()
+            
+            # Yhe mouse pointer is hidden.
+            pygame.mouse.set_visible(False)
 
     def _check_keydown_event(self, event):
         """Reacts when keys are released."""
@@ -190,6 +216,7 @@ class AlienInvasion:
             sleep(0.5)
         else:
             self.stats.game_active = False
+            pygame.mouse.set_visible(True)
 
     def _update_screen(self):
         """Updates the images on the screen and browses the new screen."""
@@ -198,6 +225,10 @@ class AlienInvasion:
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.aliens.draw(self.screen)
+
+        # Button Play draw if game not active.
+        if not self.stats.game_active:
+                self.play_button.draw_button()
 
         pygame.display.flip()
 
