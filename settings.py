@@ -22,6 +22,6 @@ class Settings():
 
         # Settings aliens.
         self.alien_speed = 1.0
-        self.fleet_drop_speed = 60
+        self.fleet_drop_speed = 10
         # fleet_direction = 1 indicates movement to right; and - 1 to the left
         self.fleet_direction = 1

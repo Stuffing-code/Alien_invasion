@@ -12,7 +12,12 @@ class Settings():
         self.bullet_allowed = 5
 
         # Alien settings.
-        self.invasion_speed = 0.6
-        self.fleet_drop_speed = 7
+        self.invasion_speed = 0.5
+        self.fleet_drop_speed = 3
         # fleet_direction = 1 indicates movement to right, and -1 to the left.
         self.fleet_direction = 1
+
+        # Ship settings.
+        self.ship_hit = 0
+        self.invasions_kills = 0
+

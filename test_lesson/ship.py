@@ -7,8 +7,8 @@ class Ship():
         self.settings = r_game.settings
         self.screen_rect = r_game.screen.get_rect()
 
-        images = 'C:\\Users\\Stuffing\\Desktop\\lessons\\Alien_invasion\\test_lesson\\images\\starship100x100.bmp'
-        self.image = pygame.image.load(images)
+        images_directory = 'C:\\Users\\Stuffing\\Desktop\\lessons\\Alien_invasion\\test_lesson\\images\\starship100x100.bmp'
+        self.image = pygame.image.load(images_directory)
         self.rect = self.image.get_rect()
 
         self.rect.midleft = self.screen_rect.midleft
@@ -26,3 +26,8 @@ class Ship():
     def blitme(self):
         """Рисует корабль в текущей позиции."""
         self.screen.blit(self.image, self.rect)
+
+    def start_position(self):
+        """Place ship in the leftmid in the screen."""
+        self.rect.midleft = self.screen_rect.midleft
+        self.y = float(self.rect.y)

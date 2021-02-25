@@ -1,8 +1,10 @@
 import sys
+from time import sleep
 
 import pygame
 
 from settings import Settings
+from gamestats import GameStats
 from ship import Ship
 from bullets import Bullet
 from invasion import Invasion
@@ -18,6 +20,8 @@ class Raketa:
         )
         pygame.display.set_caption('RAKETA BOMB')
 
+        self.stats = GameStats(self)
+
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.invasions = pygame.sprite.Group()
@@ -27,9 +31,12 @@ class Raketa:
     def run_game(self):
         while True:
             self._check_event()
-            self.ship.update()
-            self._update_bullets()
-            self._update_invasions()
+
+            if self.stats.game_active:
+                self.ship.update()
+                self._update_bullets()
+                self._update_invasions()
+            
             self._update_screen()
 
     def _check_event(self):
@@ -120,6 +127,11 @@ class Raketa:
         self._check_fleet_edges()
         self.invasions.update()
 
+        self._check_invasions_left()
+
+        if pygame.sprite.spritecollideany(self.ship, self.invasions):
+            self._ship_hit()
+
     def _check_bullet_invasion_collisions(self):
         """
         Handing of collisions of bullets with invasions.
@@ -127,10 +139,41 @@ class Raketa:
         collisions = pygame.sprite.groupcollide(
             self.bullets, self.invasions, True, True
         )
+        if collisions:
+            self._invasions_kills()
         if not self.invasions:
             # Destroy bullet and create a new fleet.
             self.bullets.empty()
             self._create_fleet()
+
+    def _invasions_kills(self):
+        if self.stats.invasions_kills < 58:
+            self.stats.invasions_kills += 1
+        else:
+            self.stats.game_active = False
+
+    def _ship_hit(self):
+        if self.stats.ship_hit < 3:
+            self.stats.ship_hit += 1
+
+            # Clearing lists invasions and projectile.
+            self.invasions.empty()
+            self.bullets.empty()
+
+            # Creating new fleet and ship midleft in the screen.
+            self._create_fleet()
+            self.ship.start_position()
+
+            sleep(0.5)
+        else:
+            self.stats.game_active = False
+
+    def _check_invasions_left(self):
+        screen_rect = self.screen.get_rect()
+        for invasion in self.invasions.sprites():
+            if invasion.rect.left <= 0:
+                self._ship_hit()
+                break
 
     def _update_screen(self):
         self.screen.fill(self.settings.bg_color)
