@@ -20,6 +20,6 @@ class GameStats():
         self.high_score = self.get_record()
 
     def get_record(self):
-        with open("record.json", "r") as f:
+        with open("history_record.json", "r") as f:
             record = f.read()
             return int(record)

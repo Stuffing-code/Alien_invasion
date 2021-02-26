@@ -69,9 +69,8 @@ class AlienInvasion:
         # Restart gme statisticians.
         self.stats.reset_stats()
         self.stats.game_active = True
-        self.sb.prep_score()
-        self.sb.prep_level()
-        self.sb.prep_ships()
+        
+        self._prep_images()
 
         # Clearing lists aliens and bullets.
         self.aliens.empty()
@@ -86,6 +85,20 @@ class AlienInvasion:
         
         # The mouse pointer is hidden.
         pygame.mouse.set_visible(False)
+
+    def _prep_images(self):
+        """Preparation images score"""
+        self.sb.prep_score()
+        self.sb.prep_level()
+        self.sb.prep_ships()
+
+    def _start_new_lewel(self):
+        """Starting new game with new settings."""
+        self.settings.increase_speed()
+
+        # Increased level.
+        self.stats.level += 1
+        self.sb.prep_level()
 
     def _check_play_button(self, mouse_pos):
         """Played new game if down button 'PLAY'"""
@@ -175,11 +188,9 @@ class AlienInvasion:
             # Destroy projectile and create new fleet.
             self.bullets.empty()
             self._create_fleet()
-            self.settings.increase_speed()
 
-            # Increased level.
-            self.stats.level += 1
-            self.sb.prep_level()
+            # Start level with new difficulty
+            self._start_new_lewel()
 
     def _create_fleet(self):
         """Create fleet invasions"""
@@ -261,7 +272,7 @@ class AlienInvasion:
 
     def _write_record(self, record):
         """Write record in file."""
-        with open('record.json', 'w') as f:
+        with open('history_record.json', 'w') as f:
             f.write(str(record))
 
     def _update_screen(self):
